@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StudyPlanner — планувальник навчальних завдань</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Перейти до основного вмісту</a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#/">StudyPlanner</a>
+      <nav aria-label="Основна навігація">
+        <a href="#/" id="nav-list">Завдання</a>
+        <a href="#/new" id="nav-new" class="btn btn-primary">+ Додати завдання</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="container" tabindex="-1"></main>
+
+  <dialog id="confirm-dialog" aria-labelledby="confirm-title" aria-describedby="confirm-text">
+    <form method="dialog">
+      <h2 id="confirm-title">Видалити завдання?</h2>
+      <p id="confirm-text"></p>
+      <div class="dialog-actions">
+        <button type="submit" value="cancel" class="btn" id="confirm-cancel">Скасувати</button>
+        <button type="submit" value="ok" class="btn btn-danger" id="confirm-ok">Видалити</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="js/validator.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/taskManager.js"></script>
+  <script src="js/filter.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
