@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" width="320" height="200" fill="none">
+  <rect width="320" height="200" rx="10" fill="#fffbeb" stroke="#fcd34d" stroke-width="2"/>
+
+  <!-- Badge Header -->
+  <rect x="15" y="12" width="165" height="24" rx="4" fill="#b45309"/>
+  <text x="25" y="28" font-family="sans-serif" font-weight="bold" font-size="12" fill="#ffffff">Українська література</text>
+
+  <!-- Open Book -->
+  <path d="M70 145C100 135 140 140 160 148C180 140 220 135 250 145V85C220 75 180 80 160 88C140 80 100 75 70 85V145Z" fill="#ffffff" stroke="#92400e" stroke-width="2.5"/>
+  <line x1="160" y1="88" x2="160" y2="148" stroke="#92400e" stroke-width="2"/>
+
+  <!-- Text lines in book -->
+  <line x1="85" y1="95" x2="145" y2="97" stroke="#d97706" stroke-width="2" stroke-linecap="round"/>
+  <line x1="85" y1="108" x2="140" y2="110" stroke="#d97706" stroke-width="2" stroke-linecap="round"/>
+  <line x1="85" y1="121" x2="135" y2="123" stroke="#d97706" stroke-width="2" stroke-linecap="round"/>
+
+  <line x1="175" y1="97" x2="235" y2="95" stroke="#d97706" stroke-width="2" stroke-linecap="round"/>
+  <line x1="175" y1="110" x2="230" y2="108" stroke="#d97706" stroke-width="2" stroke-linecap="round"/>
+  <line x1="175" y1="123" x2="225" y2="121" stroke="#d97706" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Feather Quill & Inkpot -->
+  <path d="M265 135C260 135 255 140 255 145H275C275 140 270 135 265 135Z" fill="#451a03"/>
+  <path d="M265 135L245 45C255 55 260 70 262 85C265 80 270 70 265 135Z" fill="#78350f"/>
+
+  <!-- Quote badge -->
+  <text x="160" y="175" font-family="serif" font-style="italic" font-size="13" fill="#78350f" text-anchor="middle">«Борітеся — поборете, вам Бог помагає!»</text>
+</svg>
+

@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 220" width="360" height="220" fill="none">
+  <defs>
+    <linearGradient id="deskGrad" x1="0" y1="0" x2="360" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#e2e8f0"/>
+      <stop offset="50%" stop-color="#cbd5e1"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
+    </linearGradient>
+    <linearGradient id="screenGrad" x1="0" y1="0" x2="0" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <filter id="floatShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <!-- Ground shadow / desk surface -->
+  <ellipse cx="180" cy="195" rx="140" ry="12" fill="#e2e8f0" opacity="0.7"/>
+  <rect x="40" y="190" width="280" height="6" rx="3" fill="url(#deskGrad)"/>
+
+  <!-- Plant pot on the left -->
+  <path d="M72 170L75 190H95L98 170H72Z" fill="#fb923c"/>
+  <path d="M70 167H100V171H70V167Z" fill="#f97316" rx="1"/>
+  <!-- Plant leaves -->
+  <path d="M85 167Q75 145 62 148Q74 158 85 167Z" fill="#34d399"/>
+  <path d="M85 167Q85 138 92 135Q96 150 85 167Z" fill="#10b981"/>
+  <path d="M85 167Q98 148 108 152Q98 160 85 167Z" fill="#059669"/>
+
+  <!-- Floating Notebook / Planner Center -->
+  <g filter="url(#floatShadow)">
+    <rect x="120" y="55" width="130" height="130" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="2"/>
+    <!-- Notebook top spine -->
+    <path d="M120 69C120 61.268 126.268 55 134 55H236C243.732 55 250 61.268 250 69V82H120V69Z" fill="url(#screenGrad)"/>
+    <circle cx="138" cy="68" r="3" fill="#ffffff" opacity="0.7"/>
+    <circle cx="148" cy="68" r="3" fill="#ffffff" opacity="0.7"/>
+    <circle cx="158" cy="68" r="3" fill="#ffffff" opacity="0.7"/>
+    
+    <!-- Planner checklist lines -->
+    <rect x="135" y="98" width="14" height="14" rx="3" fill="#10b981"/>
+    <path d="M138 105L141 108L146 102" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="156" y="102" width="76" height="6" rx="3" fill="#cbd5e1"/>
+
+    <rect x="135" y="124" width="14" height="14" rx="3" fill="#3b82f6"/>
+    <path d="M138 131L141 134L146 128" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="156" y="128" width="60" height="6" rx="3" fill="#cbd5e1"/>
+
+    <rect x="135" y="150" width="14" height="14" rx="3" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1.5"/>
+    <rect x="156" y="154" width="70" height="6" rx="3" fill="#e2e8f0"/>
+  </g>
+
+  <!-- Cup with coffee on the right -->
+  <rect x="270" y="160" width="22" height="30" rx="3" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <path d="M292 166H298C301 166 303 169 303 172V178C303 181 301 183 298 183H292" stroke="#cbd5e1" stroke-width="2" fill="none"/>
+  <!-- Steam lines -->
+  <path d="M276 153Q274 147 277 141" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.6"/>
+  <path d="M282 151Q284 144 281 138" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.6"/>
+
+  <!-- Sparkles / stars around -->
+  <path d="M106 75L108 81L114 83L108 85L106 91L104 85L98 83L104 81Z" fill="#fbbf24"/>
+  <path d="M265 65L266.5 69.5L271 71L266.5 72.5L265 77L263.5 72.5L259 71L263.5 69.5Z" fill="#60a5fa"/>
+  <circle cx="280" cy="98" r="3" fill="#f472b6" opacity="0.6"/>
+  <circle cx="95" cy="115" r="2.5" fill="#38bdf8" opacity="0.6"/>
+</svg>
+
