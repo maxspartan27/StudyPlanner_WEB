@@ -1,13 +1,15 @@
 /**
  * validator.js — перевірка даних завдання (клас TaskValidator з діаграми класів).
  * Не залежить від DOM: приймає «сирі» значення полів, повертає очищені дані та помилки.
- * Версія 1.4 (build 114) — валідація прикріпленого зображення/схеми.
+ * Версія 1.6 (build 171) RS2 — валідація прикріпленого зображення/схеми та розрахунок дедлайнів.
  */
 (function (global) {
   'use strict';
   const SP = (global.StudyPlanner = global.StudyPlanner || {});
 
-  const LIMITS = { title: 100, subject: 80, description: 1000, imageUrl: 2500000 };
+  // imageUrl: base64-рядок (data URL) файлу до 2 МБ займає до ~2 800 000 символів
+  // (2 МБ × 4/3 + службовий префікс), тому ліміт має бути не меншим за це значення.
+  const LIMITS = { title: 100, subject: 80, description: 1000, imageUrl: 2800000 };
 
   const MESSAGES = {
     titleRequired: 'Введіть назву (1–100 символів)',
@@ -45,6 +47,16 @@
   function formatDate(iso) {
     const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso));
     return m ? m[3] + '.' + m[2] + '.' + m[1] : String(iso);
+  }
+
+  /** Різниця у днях між todayIso та isoDate («РРРР-ММ-ДД»): 0 — сьогодні, <0 — прострочено, >0 — попереду. */
+  function daysUntil(isoDate, todayIso) {
+    const m1 = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(isoDate));
+    const m2 = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(todayIso));
+    if (!m1 || !m2) return null;
+    const t1 = Date.UTC(Number(m1[1]), Number(m1[2]) - 1, Number(m1[3]));
+    const t2 = Date.UTC(Number(m2[1]), Number(m2[2]) - 1, Number(m2[3]));
+    return Math.round((t1 - t2) / 86400000);
   }
 
   /**
@@ -97,6 +109,7 @@
     validate: validate,
     parseDisplayDate: parseDisplayDate,
     formatDate: formatDate,
+    daysUntil: daysUntil,
     length: length
   };
 })(window);
