@@ -1,11 +1,10 @@
-<!DOCTYPE html>
 <html lang="uk" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="StudyPlanner v1.6 (build 170) — сучасний планувальник навчальних завдань для студентів з підтримкою нових тем оформлення, анімацій зеленого та червоного кольорів, конфеті, схем і графіки.">
-  <meta name="version" content="1.6.170">
-  <title>StudyPlanner v1.6 (build 170) — планувальник навчальних завдань</title>
+  <meta name="description" content="StudyPlanner v1.6 (build 171) RS2 — сучасний вебпланувальник навчальних завдань з підтримкою режимів Таблиця/Картки/Канбан, таймера Помодоро, 8 тем оформлення, анімацій, конфеті, схем і аналітики.">
+  <meta name="version" content="1.6.171.RS2">
+  <title>StudyPlanner v1.6 (build 171) RS2 — планувальник навчальних завдань</title>
   <link rel="icon" type="image/svg+xml" href="img/favicon.svg">
   <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -17,12 +16,12 @@
 
   <header class="site-header">
     <div class="container header-inner">
-      <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+      <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
         <a class="brand-group" href="#/" aria-label="StudyPlanner головна">
           <img src="img/logo.svg" alt="StudyPlanner логотип" class="brand-logo" width="40" height="40">
           <span class="brand-title">Study<span>Planner</span></span>
         </a>
-        <span class="badge-version" title="Поточна версія: v1.6 (збірка 170)">v1.6 <span class="badge-build">b170</span></span>
+        <span class="badge-version" title="Поточна версія: v1.6 (build 171) RS2">v1.6 <span class="badge-build">b171 RS2</span></span>
       </div>
 
       <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
@@ -32,12 +31,39 @@
         </nav>
 
         <div class="header-controls">
-          <!-- Кнопка палітри тем з меню вибору -->
-          <button type="button" class="icon-btn" id="theme-menu-btn" aria-label="Вибрати кольорову тему" title="Палітра тем оформлення">🎨</button>
+          <!-- Кнопка Фокус-таймера Помодоро (RS2) -->
+          <button type="button" class="icon-btn pomo-trigger-btn" id="btn-pomodoro" aria-label="Фокус-таймер Помодоро" title="Фокус-таймер навчання (Помодоро RS2)">
+            <span>🍅</span>
+            <span id="pomo-mini-badge" class="pomo-mini-badge" hidden>25:00</span>
+          </button>
 
-          <!-- Випадаюче меню тем -->
+          <!-- Випадаюче вікно Фокус-таймера Помодоро -->
+          <div id="pomodoro-popover" class="pomodoro-popover" role="dialog" aria-label="Фокус-таймер Помодоро">
+            <div class="pomodoro-header">
+              <span class="theme-picker-title">🍅 Фокус-таймер RS2</span>
+              <span class="pomo-session-pill" title="Завершені навчальні сесії">Сесій: <strong id="pomo-sessions">0</strong></span>
+            </div>
+            <div class="pomo-modes">
+              <button type="button" class="pomo-mode-btn active" data-mins="25" data-mode="focus">Навчання 25хв</button>
+              <button type="button" class="pomo-mode-btn" data-mins="5" data-mode="short">Перерва 5хв</button>
+              <button type="button" class="pomo-mode-btn" data-mins="15" data-mode="long">Відпочинок 15хв</button>
+            </div>
+            <div class="pomo-clock" id="pomo-display">25:00</div>
+            <div class="pomo-progress-track">
+              <div class="pomo-progress-fill" id="pomo-bar" style="width: 100%;"></div>
+            </div>
+            <div class="pomo-actions">
+              <button type="button" class="btn btn-small btn-primary" id="pomo-start">▶️ Старт</button>
+              <button type="button" class="btn btn-small" id="pomo-reset">🔄 Скинути</button>
+            </div>
+          </div>
+
+          <!-- Кнопка палітри тем з меню вибору -->
+          <button type="button" class="icon-btn" id="theme-menu-btn" aria-label="Вибрати кольорову тему" title="Палітра тем оформлення (клавіша T)">🎨</button>
+
+          <!-- Випадаюче меню тем (8 тем оформлення у RS2) -->
           <div id="theme-picker-popover" class="theme-picker-popover" role="dialog" aria-label="Вибір теми оформлення">
-            <div class="theme-picker-title">Кольорова тема</div>
+            <div class="theme-picker-title">Кольорова тема (8 тем RS2)</div>
             <button type="button" class="theme-option-btn" data-theme-val="light">
               <span class="theme-swatch" style="background:#2563eb;"></span>
               <span>☀️ Лазур (Світла)</span>
@@ -62,10 +88,18 @@
               <span class="theme-swatch" style="background:#f59e0b;"></span>
               <span>🌅 Золотий бурштин</span>
             </button>
+            <button type="button" class="theme-option-btn" data-theme-val="ocean">
+              <span class="theme-swatch" style="background:#0284c7;"></span>
+              <span>🌊 Тихий океан (RS2)</span>
+            </button>
+            <button type="button" class="theme-option-btn" data-theme-val="lavender">
+              <span class="theme-swatch" style="background:#7c3aed;"></span>
+              <span>🔮 Аметист (RS2)</span>
+            </button>
           </div>
 
-          <button type="button" class="icon-btn" id="btn-backup" aria-label="Резервні копії (Експорт/Імпорт)" title="Резервне копіювання">💾</button>
-          <button type="button" class="icon-btn" id="btn-about" aria-label="Про версію v1.6" title="Про систему StudyPlanner v1.6">ℹ️</button>
+          <button type="button" class="icon-btn" id="btn-backup" aria-label="Резервні копії (Експорт/Імпорт)" title="Резервне копіювання (JSON / CSV)">💾</button>
+          <button type="button" class="icon-btn" id="btn-about" aria-label="Про версію v1.6 RS2" title="Про систему StudyPlanner v1.6 (build 171) RS2">ℹ️</button>
         </div>
       </div>
     </div>
@@ -76,16 +110,16 @@
   <footer class="site-footer">
     <div class="container footer-inner">
       <div>
-        <strong>StudyPlanner v1.6</strong> (build 170) • Варіант 6 • Локальна автономна робота
+        <strong>StudyPlanner v1.6</strong> (build 171) <span class="badge-rs2">RS2</span> • Варіант 6 • Локальна автономна робота
       </div>
       <div class="footer-links">
         <button type="button" id="footer-btn-theme">Тема: <span id="current-theme-label">Класична лазур</span></button>
         <span>•</span>
-        <button type="button" id="footer-btn-backup">Резервна копія (JSON)</button>
+        <button type="button" id="footer-btn-backup">Резервна копія (JSON/CSV)</button>
         <span>•</span>
         <button type="button" id="footer-btn-print" onclick="window.print()">Друк</button>
         <span>•</span>
-        <button type="button" id="footer-btn-about">Про версію 1.6</button>
+        <button type="button" id="footer-btn-about">Про версію 1.6 RS2</button>
       </div>
     </div>
   </footer>
@@ -113,32 +147,28 @@
     </div>
   </dialog>
 
-  <!-- Модальне вікно «Про версію v1.6 (build 170)» -->
+  <!-- Модальне вікно «Про версію v1.6 (build 171) RS2» -->
   <dialog id="about-dialog" aria-labelledby="about-title">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
       <div style="display:flex; align-items:center; gap:10px;">
         <img src="img/logo.svg" alt="Логотип" width="34" height="34">
-        <h2 id="about-title" style="margin:0;">StudyPlanner v1.6</h2>
+        <h2 id="about-title" style="margin:0;">StudyPlanner v1.6 <span class="badge-rs2">RS2</span></h2>
       </div>
       <button type="button" class="btn btn-small" id="about-close">✕</button>
     </div>
-    <p><strong>Версія:</strong> 1.6 | <strong>Збірка (Build):</strong> 170 | <strong>Варіант:</strong> 6</p>
+    <p><strong>Версія:</strong> 1.6 | <strong>Збірка (Build):</strong> 171 | <strong>Реліз:</strong> RS2 | <strong>Варіант:</strong> 6</p>
     <div style="font-size:0.92rem; line-height:1.6; margin-bottom:16px;">
-      <p><strong>Нововведення та модернізація у версії 1.6 (build 170):</strong></p>
+      <p><strong>Модернізація вебінтерфейсу у версії 1.6 (build 171) RS2:</strong></p>
       <ul>
-        <li>🎨 <strong>6 унікальних тем оформлення:</strong> Світла (Лазур), Темна (Космос), Смарагдова (Emerald), Рубінова (Crimson), Неонова (Cyberpunk) та Бурштинова (Sunset Amber).</li>
-        <li>✨ <strong>Анімації зеленого та червоного кольорів:</strong>
-          <ul>
-            <li>🟢 <strong>Зелені анімації успіху:</strong> анімація відмітки виконання, зелений імпульс завершення, шкала прогресу.</li>
-            <li>🔴 <strong>Червоні анімації дедлайнів:</strong> пульсуючі бейджі та картки прострочених завдань, тремтіння помилок форми.</li>
-            <li>🎉 <strong>Багатоколірний феєрверк (конфеті):</strong> салют часток при завершенні завдань або досягненні 100% прогресу.</li>
-          </ul>
-        </li>
-        <li>🖼️ <strong>Розширена галерея навчальних схем:</strong> додано ілюстрації з хімії (бензен, формули), літератури (Шевченко), математики, фізики та коду.</li>
-        <li>📊 <strong>Банер досягнень:</strong> графічне привітання з кубком при виконанні всіх навчальних завдань.</li>
-        <li>💾 <strong>Резервне копіювання:</strong> експорт та імпорт даних у форматі JSON.</li>
+        <li>🗂️ <strong>3 режими відображення (View Switcher):</strong> миттєве перемикання між класичною <em>Таблицею</em>, наочною <em>Сіткою карток</em> та інтерактивною <em>Канбан-дошкою</em> з підтримкою Drag &amp; Drop.</li>
+        <li>🍅 <strong>Вбудований Фокус-таймер Помодоро:</strong> сесії навчання (25 хв) та перерв (5/15 хв) прямо в шапці сайту зі святковим салютом після завершення.</li>
+        <li>🎨 <strong>8 тем оформлення з Glassmorphism:</strong> додано нові теми <em>«🌊 Тихий океан»</em> та <em>«🔮 Королівський аметист»</em>, напівпрозору шапку з розмиттям та плавні переходи.</li>
+        <li>📊 <strong>Аналітика RS2 та розумні бейджі дедлайнів:</strong> індикатори <em>«🔥 Сьогодні»</em>, <em>«⚡ Завтра»</em>, підрахунок днів до здачі, індекс продуктивності та швидке очищення виконаних завдань.</li>
+        <li>⚡ <strong>Покращення форми та дій:</strong> лічильники символів у реальному часі, вставка зображень із буфера обміну (<kbd>Ctrl+V</kbd>), дублювання завдань в 1 клік, нова схема з біології (ДНК) та експорт у <strong>CSV (Excel)</strong> і <strong>JSON</strong>.</li>
       </ul>
-      <p style="color:var(--muted); font-size:0.85rem;">Гарячі клавіші: <kbd>Esc</kbd> — закрити вікно, <kbd>?</kbd> — довідка.</p>
+      <p style="color:var(--muted); font-size:0.85rem;">
+        Гарячі клавіші: <kbd>/</kbd> або <kbd>Ctrl+K</kbd> — пошук, <kbd>N</kbd> — нове завдання, <kbd>T</kbd> — зміна теми, <kbd>?</kbd> — довідка, <kbd>Esc</kbd> — закрити вікно.
+      </p>
     </div>
     <div class="dialog-actions">
       <button type="button" class="btn btn-primary" id="about-ok">Зрозуміло</button>
@@ -148,17 +178,20 @@
   <!-- Модальне вікно експорту/імпорту даних -->
   <dialog id="backup-dialog" aria-labelledby="backup-title">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-      <h2 id="backup-title" style="margin:0;">Резервне копіювання даних</h2>
+      <h2 id="backup-title" style="margin:0;">Резервне копіювання та експорт</h2>
       <button type="button" class="btn btn-small" id="backup-close">✕</button>
     </div>
     <p style="font-size:0.92rem; color:var(--muted); margin-bottom:16px;">
-      Збережіть копію своїх завдань у файл JSON або відновіть раніше збережені завдання.
+      Збережіть резервну копію завдань у файл JSON, вивантажте таблицю CSV для Excel або відновіть раніше збережені завдання.
     </p>
     <div style="display:flex; flex-direction:column; gap:16px;">
       <div style="padding:14px; background:var(--surface-card); border-radius:8px; border:1px solid var(--border);">
-        <strong style="display:block; margin-bottom:6px;">Експорт завдань</strong>
-        <p style="margin:0 0 10px; font-size:0.88rem;">Завантажити всі завдання як файл <code>studyplanner-backup-v1.6.json</code>:</p>
-        <button type="button" class="btn btn-primary" id="btn-export-download">📥 Завантажити файл JSON</button>
+        <strong style="display:block; margin-bottom:6px;">Експорт завдань (JSON / CSV)</strong>
+        <p style="margin:0 0 10px; font-size:0.88rem;">Завантажити всі завдання як файл резервної копії або електронну таблицю:</p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button type="button" class="btn btn-primary" id="btn-export-download">📥 Завантажити JSON</button>
+          <button type="button" class="btn" id="btn-export-csv">📊 Вивантажити CSV (Excel)</button>
+        </div>
       </div>
 
       <div style="padding:14px; background:var(--surface-card); border-radius:8px; border:1px solid var(--border);">
