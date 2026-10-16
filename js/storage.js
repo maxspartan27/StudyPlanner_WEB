@@ -2,7 +2,7 @@
  * storage.js — збереження завдань у localStorage (клас TaskStorage з діаграми класів).
  * Дані зберігаються як JSON-масив під ключем «studyplanner.tasks».
  * Помилка читання ніколи не призводить до автоматичного перезапису сховища порожнім списком.
- * Версія 1.4 (build 114) — підтримка поля imageUrl з повною зворотною сумісністю.
+ * Версія 1.6 (build 171) RS2 — підтримка поля imageUrl, тем оформлення та режимів відображення (Таблиця / Картки / Канбан).
  */
 (function (global) {
   'use strict';
@@ -11,6 +11,7 @@
   const STORAGE_KEY = 'studyplanner.tasks';
   const BACKUP_KEY = 'studyplanner.tasks.backup';
   const THEME_KEY = 'studyplanner.theme';
+  const VIEW_MODE_KEY = 'studyplanner.viewMode';
 
   function looksLikeTask(t) {
     return t && typeof t === 'object' &&
@@ -86,10 +87,31 @@
         return false;
       }
     }
+
+    /** Отримання збереженого режиму перегляду (TABLE / CARDS / KANBAN) */
+    getViewMode() {
+      try {
+        const m = global.localStorage.getItem(VIEW_MODE_KEY);
+        return ['TABLE', 'CARDS', 'KANBAN'].includes(m) ? m : 'TABLE';
+      } catch (e) {
+        return 'TABLE';
+      }
+    }
+
+    /** Збереження режиму перегляду */
+    setViewMode(mode) {
+      try {
+        global.localStorage.setItem(VIEW_MODE_KEY, mode);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
   }
 
   SP.TaskStorage = TaskStorage;
   SP.STORAGE_KEY = STORAGE_KEY;
   SP.BACKUP_KEY = BACKUP_KEY;
   SP.THEME_KEY = THEME_KEY;
+  SP.VIEW_MODE_KEY = VIEW_MODE_KEY;
 })(window);
