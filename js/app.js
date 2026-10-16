@@ -1,12 +1,14 @@
 /**
  * app.js — інтерфейс (клас UIController): маршрутизація, відображення, обробка дій користувача.
- * Версія 1.6 (build 170) — кольорові теми, анімації зеленого та червоного кольорів, конфеті, графіка.
+ * Версія 1.6 (build 171) RS2 — 3 режими відображення (Таблиця, Картки, Канбан), таймер Помодоро,
+ * 8 кольорових тем, анімації зеленого та червоного кольорів, конфеті, аналітика RS2, графіка.
  */
 (function (global) {
   'use strict';
   const SP = global.StudyPlanner;
   SP.VERSION = '1.6';
-  SP.BUILD = '170';
+  SP.BUILD = '171';
+  SP.RELEASE = 'RS2';
 
   const doc = global.document;
   const PRIORITY = SP.TaskManager.PRIORITY;
@@ -15,8 +17,12 @@
   const storage = new SP.TaskStorage();
   const manager = new SP.TaskManager(storage, SP.Validator);
   const filter = new SP.TaskFilter();
-  const view = { sortMode: 'BY_DATE' };
+  const view = {
+    sortMode: 'BY_DATE',
+    displayMode: storage.getViewMode ? storage.getViewMode() : 'TABLE'
+  };
   const main = doc.getElementById('main');
+  let lastCompletedId = null;
 
   const THEMES = {
     light: 'Класична лазур',
@@ -24,7 +30,9 @@
     emerald: 'Смарагд & Природа',
     crimson: 'Рубінове полум’я',
     neon: 'Кіберпанк Неон',
-    amber: 'Золотий бурштин'
+    amber: 'Золотий бурштин',
+    ocean: 'Тихий океан (RS2)',
+    lavender: 'Королівський аметист (RS2)'
   };
 
   /* ---------- Система анімації багатоколірного конфеті ---------- */
@@ -45,7 +53,7 @@
     ];
 
     const particles = [];
-    const count = 120;
+    const count = 130;
     for (let i = 0; i < count; i++) {
       particles.push({
         x: Math.random() * width,
@@ -102,7 +110,7 @@
     render();
   }
 
-  /* ---------- Керування темами оформлення ---------- */
+  /* ---------- Керування темами оформлення (8 тем RS2) ---------- */
   function initTheme() {
     const saved = storage.getTheme();
     const current = THEMES[saved] ? saved : 'light';
@@ -111,10 +119,12 @@
     const themeMenuBtn = doc.getElementById('theme-menu-btn');
     const popover = doc.getElementById('theme-picker-popover');
     const footerThemeBtn = doc.getElementById('footer-btn-theme');
+    const pomoPopover = doc.getElementById('pomodoro-popover');
 
     function togglePopover(e) {
       if (e) e.stopPropagation();
       if (!popover) return;
+      if (pomoPopover) pomoPopover.classList.remove('open');
       popover.classList.toggle('open');
     }
 
@@ -155,6 +165,138 @@
         btn.classList.remove('active');
       }
     });
+  }
+
+  function cycleTheme() {
+    const keys = Object.keys(THEMES);
+    const current = doc.documentElement.getAttribute('data-theme') || 'light';
+    const nextIdx = (keys.indexOf(current) + 1) % keys.length;
+    const nextTheme = keys[nextIdx];
+    applyTheme(nextTheme);
+    storage.setTheme(nextTheme);
+    toast('Тема оформлення: ' + THEMES[nextTheme], false);
+  }
+
+  /* ---------- Фокус-таймер Помодоро (RS2) ---------- */
+  function initPomodoro() {
+    const btnPomo = doc.getElementById('btn-pomodoro');
+    const popover = doc.getElementById('pomodoro-popover');
+    const themePopover = doc.getElementById('theme-picker-popover');
+    const display = doc.getElementById('pomo-display');
+    const bar = doc.getElementById('pomo-bar');
+    const startBtn = doc.getElementById('pomo-start');
+    const resetBtn = doc.getElementById('pomo-reset');
+    const sessionsEl = doc.getElementById('pomo-sessions');
+    const miniBadge = doc.getElementById('pomo-mini-badge');
+    const modeBtns = doc.querySelectorAll('.pomo-mode-btn');
+
+    if (!btnPomo || !popover || !display) return;
+
+    let totalSeconds = 25 * 60;
+    let remainingSeconds = totalSeconds;
+    let timerId = null;
+    let currentMode = 'focus';
+    let sessionsDone = 0;
+
+    function fmtTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+    }
+
+    function updateUI() {
+      const txt = fmtTime(remainingSeconds);
+      display.textContent = txt;
+      const pct = totalSeconds > 0 ? Math.max(0, Math.min(100, (remainingSeconds / totalSeconds) * 100)) : 100;
+      if (bar) bar.style.width = pct + '%';
+      if (miniBadge) {
+        if (timerId !== null) {
+          miniBadge.hidden = false;
+          miniBadge.textContent = txt;
+        } else {
+          miniBadge.hidden = remainingSeconds === totalSeconds;
+          miniBadge.textContent = txt;
+        }
+      }
+      if (startBtn) {
+        startBtn.textContent = timerId !== null ? '⏸️ Пауза' : '▶️ Старт';
+      }
+    }
+
+    function stopTimer() {
+      if (timerId !== null) {
+        global.clearInterval(timerId);
+        timerId = null;
+      }
+      if (btnPomo) btnPomo.classList.remove('is-running');
+      updateUI();
+    }
+
+    function tick() {
+      if (remainingSeconds > 0) {
+        remainingSeconds--;
+        updateUI();
+      } else {
+        stopTimer();
+        if (currentMode === 'focus') {
+          sessionsDone++;
+          if (sessionsEl) sessionsEl.textContent = String(sessionsDone);
+          fireConfetti(3000);
+          toast('🍅 Фокус-сесію завершено! Час зробити перерву!', false);
+        } else {
+          toast('☕ Перерву завершено! Готові до навчання!', false);
+        }
+        remainingSeconds = totalSeconds;
+        updateUI();
+      }
+    }
+
+    btnPomo.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (themePopover) themePopover.classList.remove('open');
+      popover.classList.toggle('open');
+    });
+
+    doc.addEventListener('click', (e) => {
+      if (popover && !popover.contains(e.target) && !btnPomo.contains(e.target)) {
+        popover.classList.remove('open');
+      }
+    });
+
+    modeBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        stopTimer();
+        modeBtns.forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        const mins = Number(btn.getAttribute('data-mins')) || 25;
+        currentMode = btn.getAttribute('data-mode') || 'focus';
+        totalSeconds = mins * 60;
+        remainingSeconds = totalSeconds;
+        updateUI();
+      });
+    });
+
+    if (startBtn) {
+      startBtn.addEventListener('click', () => {
+        if (timerId !== null) {
+          stopTimer();
+        } else {
+          timerId = global.setInterval(tick, 1000);
+          btnPomo.classList.add('is-running');
+          updateUI();
+        }
+      });
+    }
+
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        stopTimer();
+        remainingSeconds = totalSeconds;
+        updateUI();
+      });
+    }
+
+    updateUI();
   }
 
   /* ---------- Допоміжні функції DOM ---------- */
@@ -215,6 +357,24 @@
     return h('span', { class: 'badge ' + cls, text: text });
   }
 
+  /** Розумний індикатор дедлайну RS2 (Сьогодні, Завтра, Через N дн.) */
+  function buildDeadlineChip(task, today) {
+    if (task.status === 'DONE') return null;
+    if (!SP.Validator || !SP.Validator.daysUntil) return null;
+    const diff = SP.Validator.daysUntil(task.dueDate, today);
+    if (diff === null || diff < 0) return null; // прострочені вже мають badge-overdue
+    if (diff === 0) {
+      return h('span', { class: 'deadline-chip chip-today', title: 'Дедлайн сьогодні!', text: '🔥 Сьогодні' });
+    }
+    if (diff === 1) {
+      return h('span', { class: 'deadline-chip chip-tomorrow', title: 'Дедлайн завтра', text: '⚡ Завтра' });
+    }
+    if (diff <= 5) {
+      return h('span', { class: 'deadline-chip chip-soon', title: 'Залишилось днів: ' + diff, text: '🕒 ' + diff + ' дн.' });
+    }
+    return null;
+  }
+
   function optionList(map, selected) {
     return Object.keys(map).map((k) => h('option', { value: k, text: map[k].label, selected: k === selected }));
   }
@@ -261,9 +421,9 @@
     const headerRow = h('div', { style: 'display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;' }, [
       h('h1', { style: 'margin:0;' }, [
         doc.createTextNode('Мої навчальні завдання'),
-        h('span', { class: 'badge-version', style: 'font-size:0.75rem; vertical-align:middle;', text: 'v' + SP.VERSION })
+        h('span', { class: 'badge-version', style: 'font-size:0.75rem; vertical-align:middle;', text: 'v' + SP.VERSION + ' ' + SP.RELEASE })
       ]),
-      h('div', { style: 'display:flex; gap:8px;' }, [
+      h('div', { style: 'display:flex; gap:8px; flex-wrap:wrap;' }, [
         h('a', { class: 'btn btn-primary', href: '#/new', text: '➕ Створити завдання' })
       ])
     ]);
@@ -280,7 +440,7 @@
       return;
     }
 
-    // Дашборд статистики та шкала прогресу
+    // Дашборд статистики та шкала прогресу RS2
     main.appendChild(buildDashboard());
 
     // Панель фільтрів
@@ -314,29 +474,71 @@
     }
 
     if (stats.total > 0) {
-      // Шкала прогресу
+      const analyticsPills = [
+        h('span', { class: 'analytics-pill pill-score', title: 'Комплексний показник виконання та активності RS2' }, [
+          doc.createTextNode('🏆 Індекс продуктивності: '),
+          h('strong', { text: stats.productivityScore + '%' })
+        ]),
+        h('span', { class: 'analytics-pill' + (stats.dueToday > 0 ? ' pill-warn' : ''), title: 'Завдання з дедлайном сьогодні' }, [
+          doc.createTextNode('🔥 На сьогодні: '),
+          h('strong', { text: String(stats.dueToday) })
+        ]),
+        h('span', { class: 'analytics-pill', title: 'Активні завдання високого пріоритету' }, [
+          doc.createTextNode('🚩 Високий пріоритет: '),
+          h('strong', { text: String(stats.highPriority) })
+        ]),
+        h('span', { class: 'analytics-pill', title: 'Завдання з прикріпленими схемами чи фото' }, [
+          doc.createTextNode('🖼️ Зі схемами: '),
+          h('strong', { text: String(stats.withImages) })
+        ])
+      ];
+
+      if (stats.done > 0) {
+        analyticsPills.push(h('button', {
+          type: 'button',
+          class: 'analytics-clear-btn',
+          title: 'Видалити всі завершені завдання зі списку',
+          text: '🧹 Очистити виконані (' + stats.done + ')',
+          onclick: () => {
+            const res = manager.clearCompleted();
+            if (res.ok) {
+              toast('Очищено виконаних завдань: ' + res.count, false);
+              route();
+            } else {
+              toast(res.error, true);
+            }
+          }
+        }));
+      }
+
+      // Шкала прогресу + аналітична стрічка RS2
       const progressBox = h('div', { class: 'progress-container' }, [
         h('div', { class: 'progress-bar-wrap' }, [
           h('div', { style: 'font-size:0.9rem; font-weight:800; color:var(--text);' }, [doc.createTextNode('Загальний прогрес виконання:')]),
-          h('div', { class: 'progress-track' }, [
+          h('div', { class: 'progress-track', title: 'Виконано: ' + stats.percent + '% | У роботі: ' + stats.inProgressPct + '%' }, [
             h('div', { class: 'progress-fill', style: 'width: ' + stats.percent + '%;' })
           ]),
           h('div', { class: 'progress-text', text: stats.percent + '% (' + stats.done + ' із ' + stats.total + ')' })
-        ])
+        ]),
+        h('div', { class: 'rs2-analytics-bar' }, analyticsPills)
       ]);
       wrap.appendChild(progressBox);
     }
 
+    // Швидкий фільтр: спочатку скидаємо попередні умови, потім перемальовуємо екран,
+    // щоб елементи панелі фільтрів відображали фактично застосовані умови.
+    const quickFilter = (apply) => () => { filter.reset(); apply(); route(); };
+    const isTotalActive = !filter.isActive();
     const cards = [
-      { key: 'total', label: 'Всього завдань', icon: '📚', val: stats.total, cls: '', action: () => { filter.reset(); renderResults(); } },
-      { key: 'planned', label: 'Заплановано', icon: '🗓️', val: stats.planned, cls: '', action: () => { filter.status = 'PLANNED'; renderResults(); } },
-      { key: 'progress', label: 'У роботі', icon: '⏳', val: stats.inProgress, cls: 'stat-progress', action: () => { filter.status = 'IN_PROGRESS'; renderResults(); } },
-      { key: 'done', label: 'Виконано', icon: '✅', val: stats.done, cls: 'stat-done', action: () => { filter.status = 'DONE'; renderResults(); } },
-      { key: 'overdue', label: 'Прострочено', icon: '🚨', val: stats.overdue, cls: stats.overdue > 0 ? 'stat-overdue' : '', action: () => { filter.overdueOnly = true; renderResults(); } }
+      { key: 'total', label: 'Всього завдань', icon: '📚', val: stats.total, cls: isTotalActive ? 'is-active-filter' : '', action: quickFilter(() => {}) },
+      { key: 'planned', label: 'Заплановано', icon: '🗓️', val: stats.planned, cls: filter.status === 'PLANNED' ? 'is-active-filter' : '', action: quickFilter(() => { filter.status = 'PLANNED'; }) },
+      { key: 'progress', label: 'У роботі', icon: '⏳', val: stats.inProgress, cls: 'stat-progress' + (filter.status === 'IN_PROGRESS' ? ' is-active-filter' : ''), action: quickFilter(() => { filter.status = 'IN_PROGRESS'; }) },
+      { key: 'done', label: 'Виконано', icon: '✅', val: stats.done, cls: 'stat-done' + (filter.status === 'DONE' ? ' is-active-filter' : ''), action: quickFilter(() => { filter.status = 'DONE'; }) },
+      { key: 'overdue', label: 'Прострочено', icon: '🚨', val: stats.overdue, cls: (stats.overdue > 0 ? 'stat-overdue' : '') + (filter.overdueOnly ? ' is-active-filter' : ''), action: quickFilter(() => { filter.overdueOnly = true; }) }
     ];
 
     const grid = h('div', { class: 'stats-grid' }, cards.map((c) => {
-      const card = h('div', { class: 'stat-card ' + c.cls, title: 'Клікніть для фільтрування' }, [
+      const card = h('div', { class: 'stat-card ' + c.cls, title: 'Клікніть для швидкого фільтрування' }, [
         h('div', { class: 'stat-card-header' }, [
           h('span', { class: 'stat-label', text: c.label }),
           h('span', { class: 'stat-icon', text: c.icon })
@@ -353,15 +555,20 @@
 
   function buildToolbar() {
     const subjects = manager.getSubjects();
+    // Якщо вибраного предмета більше немає серед завдань (видалено або змінено), умова скидається,
+    // інакше список лишався б відфільтрованим невидимою умовою.
+    if (filter.subject && subjects.indexOf(filter.subject) === -1) filter.subject = '';
     const subjectSel = h('select', { id: 'f-subject' }, [h('option', { value: '', text: 'Усі предмети' })].concat(
       subjects.map((s) => h('option', { value: s, text: s, selected: s === filter.subject }))));
     const prioritySel = h('select', { id: 'f-priority' }, [h('option', { value: '', text: 'Усі пріоритети' })].concat(optionList(PRIORITY, filter.priority)));
     const statusSel = h('select', { id: 'f-status' }, [h('option', { value: '', text: 'Усі статуси' })].concat(optionList(STATUS, filter.status)));
     const sortSel = h('select', { id: 'f-sort' }, [
       h('option', { value: 'BY_DATE', text: 'За датою виконання', selected: view.sortMode === 'BY_DATE' }),
-      h('option', { value: 'BY_PRIORITY', text: 'За пріоритетом', selected: view.sortMode === 'BY_PRIORITY' })
+      h('option', { value: 'BY_PRIORITY', text: 'За пріоритетом', selected: view.sortMode === 'BY_PRIORITY' }),
+      h('option', { value: 'BY_STATUS', text: 'За статусом (активні перші)', selected: view.sortMode === 'BY_STATUS' }),
+      h('option', { value: 'BY_TITLE', text: 'За алфавітом (А–Я)', selected: view.sortMode === 'BY_TITLE' })
     ]);
-    const search = h('input', { type: 'search', id: 'f-query', value: filter.query, placeholder: 'Пошук за назвою або предметом...', autocomplete: 'off' });
+    const search = h('input', { type: 'search', id: 'f-query', value: filter.query, placeholder: 'Пошук за назвою, предметом чи описом (натисніть /)...', autocomplete: 'off' });
     const overdue = h('input', { type: 'checkbox', id: 'f-overdue', checked: filter.overdueOnly });
     const withImage = h('input', { type: 'checkbox', id: 'f-image', checked: filter.withImageOnly });
 
@@ -392,6 +599,12 @@
     ]);
   }
 
+  function setDisplayMode(mode) {
+    view.displayMode = mode;
+    if (storage.setViewMode) storage.setViewMode(mode);
+    renderResults();
+  }
+
   function renderResults() {
     const box = doc.getElementById('results');
     if (!box) return;
@@ -402,15 +615,15 @@
       box.appendChild(h('div', { class: 'panel empty' }, [
         h('img', { src: 'img/empty-tasks.svg', alt: 'Немає завдань', class: 'empty-illustration' }),
         h('h2', { text: 'У вас ще немає навчальних завдань' }),
-        h('p', { text: 'Створіть своє перше завдання, додайте фото конспектів або схем, або завантажте готові приклади для перевірки можливостей v1.6.' }),
+        h('p', { text: 'Створіть своє перше завдання, додайте фото конспектів або схем, або завантажте готові приклади для перевірки можливостей v1.6 (build 171) RS2.' }),
         h('div', { class: 'empty-actions' }, [
           h('a', { class: 'btn btn-primary', href: '#/new', text: '➕ Додати перше завдання' }),
           h('button', {
-            type: 'button', class: 'btn', text: '✨ Завантажити демонстраційні завдання',
+            type: 'button', class: 'btn', text: '✨ Завантажити демонстраційні завдання (RS2)',
             onclick: () => {
               manager.loadSampleTasks();
               fireConfetti(2000);
-              toast('Демонстраційні завдання з кресленнями завантажено!', false);
+              toast('Демонстраційні завдання (6 предметів RS2) завантажено!', false);
               route();
             }
           })
@@ -434,37 +647,66 @@
       return;
     }
 
+    const viewSwitcher = h('div', { class: 'view-switcher', role: 'group', 'aria-label': 'Режим відображення завдань' }, [
+      h('button', {
+        type: 'button',
+        class: 'view-mode-btn' + (view.displayMode === 'TABLE' ? ' active' : ''),
+        title: 'Табличний режим',
+        text: '📋 Таблиця',
+        onclick: () => setDisplayMode('TABLE')
+      }),
+      h('button', {
+        type: 'button',
+        class: 'view-mode-btn' + (view.displayMode === 'CARDS' ? ' active' : ''),
+        title: 'Режим карток (плитка)',
+        text: '🗂️ Картки',
+        onclick: () => setDisplayMode('CARDS')
+      }),
+      h('button', {
+        type: 'button',
+        class: 'view-mode-btn' + (view.displayMode === 'KANBAN' ? ' active' : ''),
+        title: 'Канбан-дошка за статусами',
+        text: '📊 Канбан',
+        onclick: () => setDisplayMode('KANBAN')
+      })
+    ]);
+
     const summaryBar = h('div', { class: 'summary-bar' }, [
       h('p', { class: 'summary', id: 'summary', text: 'Показано ' + tasks.length + ' із ' + total + ' завдань' }),
-      h('div', { style: 'font-size:0.85rem; color:var(--muted);' }, [
-        doc.createTextNode('Порада: клацніть чекбокс зліва для завершення із зеленим спалахом')
-      ])
+      viewSwitcher
     ]);
     box.appendChild(summaryBar);
 
-    const tbody = h('tbody');
-    tasks.forEach((t) => tbody.appendChild(buildRow(t, today)));
-    box.appendChild(h('div', { class: 'table-wrap' }, [
-      h('table', { id: 'task-table' }, [
-        h('thead', {}, [
-          h('tr', {}, [
-            h('th', { scope: 'col', style: 'width: 44px; text-align:center;', text: 'Готово' }),
-            h('th', { scope: 'col', text: 'Назва завдання' }),
-            h('th', { scope: 'col', text: 'Предмет' }),
-            h('th', { scope: 'col', text: 'Дата виконання' }),
-            h('th', { scope: 'col', text: 'Пріоритет' }),
-            h('th', { scope: 'col', text: 'Статус' }),
-            h('th', { scope: 'col', text: 'Дії' })
-          ])
-        ]),
-        tbody
-      ])
-    ]));
+    if (view.displayMode === 'CARDS') {
+      box.appendChild(buildCardsGrid(tasks, today));
+    } else if (view.displayMode === 'KANBAN') {
+      box.appendChild(buildKanbanBoard(tasks, today));
+    } else {
+      const tbody = h('tbody');
+      tasks.forEach((t) => tbody.appendChild(buildRow(t, today)));
+      box.appendChild(h('div', { class: 'table-wrap' }, [
+        h('table', { id: 'task-table' }, [
+          h('thead', {}, [
+            h('tr', {}, [
+              h('th', { scope: 'col', style: 'width: 44px; text-align:center;', text: 'Готово' }),
+              h('th', { scope: 'col', text: 'Назва завдання' }),
+              h('th', { scope: 'col', text: 'Предмет' }),
+              h('th', { scope: 'col', text: 'Дата виконання' }),
+              h('th', { scope: 'col', text: 'Пріоритет' }),
+              h('th', { scope: 'col', text: 'Статус' }),
+              h('th', { scope: 'col', text: 'Дії' })
+            ])
+          ]),
+          tbody
+        ])
+      ]));
+    }
   }
 
   function buildRow(t, today) {
     const overdue = t.isOverdue(today);
     const isDone = t.status === 'DONE';
+    const justDone = t.id === lastCompletedId;
 
     // Чекбокс швидкого завершення з зеленою анімацією
     const quickBtn = h('button', {
@@ -476,7 +718,10 @@
         const nextStatus = isDone ? 'PLANNED' : 'DONE';
         const res = manager.changeStatus(t.id, nextStatus);
         if (res.ok && !isDone) {
+          lastCompletedId = t.id;
           fireConfetti(1800);
+        } else {
+          lastCompletedId = null;
         }
         applyChange(res, isDone ? 'Повернуто в план' : 'Завдання виконано! 🎉');
       }
@@ -512,7 +757,10 @@
       const isFinishing = stat.value === 'DONE';
       const res = manager.changeStatus(t.id, stat.value);
       if (res.ok && isFinishing) {
+        lastCompletedId = t.id;
         fireConfetti(1800);
+      } else {
+        lastCompletedId = null;
       }
       applyChange(res, 'Статус змінено');
     });
@@ -521,9 +769,21 @@
     if (overdue) {
       dateCell.appendChild(doc.createTextNode(' '));
       dateCell.appendChild(badge('badge-overdue', 'Прострочено'));
+    } else {
+      const chip = buildDeadlineChip(t, today);
+      if (chip) {
+        dateCell.appendChild(doc.createTextNode(' '));
+        dateCell.appendChild(chip);
+      }
     }
 
-    return h('tr', { class: (overdue ? 'is-overdue ' : '') + (isDone ? 'is-done' : ''), 'data-id': t.id }, [
+    const rowCls = [
+      overdue ? 'is-overdue' : '',
+      isDone ? 'is-done' : '',
+      justDone ? 'just-completed' : ''
+    ].filter(Boolean).join(' ');
+
+    return h('tr', { class: rowCls, 'data-id': t.id }, [
       h('td', { 'data-label': 'Готово', style: 'text-align:center;' }, [quickBtn]),
       h('td', { class: 'task-title-cell', 'data-label': 'Назва' }, titleElements),
       h('td', { 'data-label': 'Предмет', text: t.subject }),
@@ -534,6 +794,17 @@
         h('a', { class: 'btn btn-small', href: '#/edit/' + t.id, 'aria-label': 'Редагувати завдання «' + t.title + '»', text: '✏️ Редагувати' }),
         h('button', {
           type: 'button',
+          class: 'btn btn-small row-duplicate',
+          'aria-label': 'Дублювати завдання «' + t.title + '»',
+          text: '📋',
+          title: 'Дублювати завдання',
+          onclick: () => {
+            const res = manager.duplicateTask(t.id);
+            applyChange(res, 'Завдання дубльовано 📋');
+          }
+        }),
+        h('button', {
+          type: 'button',
           class: 'btn btn-small btn-danger row-delete',
           'aria-label': 'Видалити завдання «' + t.title + '»',
           text: '🗑️',
@@ -542,6 +813,174 @@
         })
       ])])
     ]);
+  }
+
+  /* ---------- Режим сітки карток (CARDS View RS2) ---------- */
+  function buildCardsGrid(tasks, today) {
+    return h('div', { class: 'cards-grid', id: 'task-cards-grid' }, tasks.map((t) => {
+      const overdue = t.isOverdue(today);
+      const isDone = t.status === 'DONE';
+      const chip = buildDeadlineChip(t, today);
+
+      const quickBtn = h('button', {
+        type: 'button',
+        class: 'quick-complete-btn' + (isDone ? ' is-done' : ''),
+        title: isDone ? 'Позначити невиконаним' : 'Позначити виконаним',
+        onclick: () => {
+          const next = isDone ? 'PLANNED' : 'DONE';
+          const res = manager.changeStatus(t.id, next);
+          if (res.ok && !isDone) fireConfetti(1800);
+          applyChange(res, isDone ? 'Повернуто в план' : 'Завдання виконано! 🎉');
+        }
+      }, [isDone ? '✓' : '○']);
+
+      const cardChildren = [];
+      if (t.imageUrl) {
+        cardChildren.push(h('div', { class: 'task-card-banner', onclick: () => showLightbox(t.imageUrl, t.title) }, [
+          h('img', { src: t.imageUrl, alt: t.title, loading: 'lazy' })
+        ]));
+      }
+
+      const badgesRow = [
+        badge('badge-' + t.priority, PRIORITY[t.priority].label),
+        badge('badge-' + t.status, STATUS[t.status].label)
+      ];
+      if (overdue) badgesRow.push(badge('badge-overdue', 'Прострочено'));
+      else if (chip) badgesRow.push(chip);
+
+      cardChildren.push(h('div', { class: 'task-card-body' }, [
+        h('div', { class: 'task-card-top' }, [
+          h('span', { class: 'task-card-subject', text: '📚 ' + t.subject }),
+          quickBtn
+        ]),
+        h('a', { class: 'task-card-title task-link', href: '#/task/' + t.id, text: t.title }),
+        t.description ? h('p', { class: 'task-card-desc', text: t.description }) : null,
+        h('div', { class: 'task-card-badges' }, badgesRow),
+        h('div', { class: 'task-card-footer' }, [
+          h('span', { class: 'task-card-date', text: '📅 ' + SP.Validator.formatDate(t.dueDate) }),
+          h('div', { class: 'task-card-actions' }, [
+            h('a', { class: 'btn btn-small', href: '#/edit/' + t.id, title: 'Редагувати', text: '✏️' }),
+            h('button', {
+              type: 'button', class: 'btn btn-small', title: 'Дублювати', text: '📋',
+              onclick: () => applyChange(manager.duplicateTask(t.id), 'Завдання дубльовано 📋')
+            }),
+            h('button', {
+              type: 'button', class: 'btn btn-small btn-danger', title: 'Видалити', text: '🗑️',
+              onclick: () => doDelete(t, false)
+            })
+          ])
+        ])
+      ]));
+
+      return h('article', {
+        class: 'task-card-item' + (overdue ? ' is-overdue' : '') + (isDone ? ' is-done' : ''),
+        'data-id': t.id
+      }, cardChildren);
+    }));
+  }
+
+  /* ---------- Режим Канбан-дошки (KANBAN View RS2 з Drag & Drop) ---------- */
+  function buildKanbanBoard(tasks, today) {
+    const columns = [
+      { code: 'PLANNED', title: '🗓️ Заплановано', cls: 'kanban-col-planned' },
+      { code: 'IN_PROGRESS', title: '⏳ У роботі', cls: 'kanban-col-progress' },
+      { code: 'DONE', title: '✅ Виконано', cls: 'kanban-col-done' }
+    ];
+
+    return h('div', { class: 'kanban-board', id: 'task-kanban-board' }, columns.map((col) => {
+      const colTasks = tasks.filter((t) => t.status === col.code);
+      const listEl = h('div', { class: 'kanban-list' }, colTasks.length === 0
+        ? [h('div', { class: 'kanban-empty', text: 'Перетягніть завдання сюди або змініть статус' })]
+        : colTasks.map((t) => buildKanbanCard(t, today))
+      );
+
+      const colEl = h('div', { class: 'kanban-col ' + col.cls, 'data-status': col.code }, [
+        h('div', { class: 'kanban-col-header' }, [
+          h('span', { class: 'kanban-col-title', text: col.title }),
+          h('span', { class: 'kanban-col-count', text: String(colTasks.length) })
+        ]),
+        listEl
+      ]);
+
+      colEl.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        colEl.classList.add('kanban-dragover');
+      });
+      colEl.addEventListener('dragleave', () => {
+        colEl.classList.remove('kanban-dragover');
+      });
+      colEl.addEventListener('drop', (e) => {
+        e.preventDefault();
+        colEl.classList.remove('kanban-dragover');
+        const draggedId = e.dataTransfer ? e.dataTransfer.getData('text/plain') : '';
+        if (draggedId) {
+          const task = manager.getTask(draggedId);
+          if (task && task.status !== col.code) {
+            const res = manager.changeStatus(draggedId, col.code);
+            if (res.ok && col.code === 'DONE') fireConfetti(1800);
+            applyChange(res, 'Переміщено у «' + STATUS[col.code].label + '»');
+          }
+        }
+      });
+
+      return colEl;
+    }));
+  }
+
+  function buildKanbanCard(t, today) {
+    const overdue = t.isOverdue(today);
+    const chip = buildDeadlineChip(t, today);
+    const nextStatusMap = { PLANNED: 'IN_PROGRESS', IN_PROGRESS: 'DONE', DONE: 'PLANNED' };
+    const nextStatusLabel = { PLANNED: '▶️ В роботу', IN_PROGRESS: '✅ Виконати', DONE: '↩️ У план' };
+
+    const card = h('div', {
+      class: 'kanban-card' + (overdue ? ' is-overdue' : '') + (t.status === 'DONE' ? ' is-done' : ''),
+      draggable: 'true',
+      'data-id': t.id
+    }, [
+      t.imageUrl ? h('img', {
+        src: t.imageUrl,
+        alt: t.title,
+        class: 'kanban-card-img',
+        onclick: () => showLightbox(t.imageUrl, t.title)
+      }) : null,
+      h('div', { class: 'kanban-card-meta' }, [
+        h('span', { class: 'task-card-subject', text: t.subject }),
+        badge('badge-' + t.priority, PRIORITY[t.priority].label)
+      ]),
+      h('a', { class: 'kanban-card-title task-link', href: '#/task/' + t.id, text: t.title }),
+      h('div', { class: 'kanban-card-bottom' }, [
+        h('span', { class: 'task-card-date', text: '📅 ' + SP.Validator.formatDate(t.dueDate) }),
+        overdue ? badge('badge-overdue', 'Прострочено') : chip
+      ]),
+      h('div', { class: 'kanban-card-actions' }, [
+        h('button', {
+          type: 'button',
+          class: 'btn btn-small',
+          text: nextStatusLabel[t.status],
+          onclick: () => {
+            const target = nextStatusMap[t.status];
+            const res = manager.changeStatus(t.id, target);
+            if (res.ok && target === 'DONE') fireConfetti(1800);
+            applyChange(res, 'Статус змінено');
+          }
+        }),
+        h('a', { class: 'btn btn-small', href: '#/edit/' + t.id, title: 'Редагувати', text: '✏️' })
+      ])
+    ]);
+
+    card.addEventListener('dragstart', (e) => {
+      card.classList.add('is-dragging');
+      if (e.dataTransfer) {
+        e.dataTransfer.setData('text/plain', t.id);
+        e.dataTransfer.effectAllowed = 'move';
+      }
+    });
+    card.addEventListener('dragend', () => {
+      card.classList.remove('is-dragging');
+    });
+
+    return card;
   }
 
   function applyChange(res, okMessage) {
@@ -601,10 +1040,25 @@
     const formError = h('p', { class: 'form-error', id: 'form-error', role: 'alert' });
     const errorEls = {};
 
-    function field(key, label, hint, required, extra) {
+    function field(key, label, hint, required, extra, maxLen) {
       const err = h('div', { class: 'error-text', id: key + '-error' });
       errorEls[key] = err;
-      const kids = [h('label', { for: key, text: label + (required ? ' *' : '') }), fields[key]];
+
+      const labelRowChildren = [h('label', { for: key, text: label + (required ? ' *' : '') })];
+      if (maxLen) {
+        const counter = h('span', { class: 'char-counter', text: SP.Validator.length(fields[key].value) + ' / ' + maxLen });
+        fields[key].addEventListener('input', () => {
+          const len = SP.Validator.length(fields[key].value);
+          counter.textContent = len + ' / ' + maxLen;
+          counter.classList.toggle('is-over', len > maxLen);
+        });
+        labelRowChildren.push(counter);
+      }
+
+      const kids = [
+        h('div', { class: 'field-label-row' }, labelRowChildren),
+        fields[key]
+      ];
       if (extra) kids.push(extra);
       if (hint) kids.push(h('div', { class: 'hint', text: hint }));
       kids.push(err);
@@ -697,11 +1151,12 @@
       { label: '⚡ Фізика', path: 'img/sample-physics.svg' },
       { label: '💻 Код', path: 'img/sample-code.svg' },
       { label: '🧪 Хімія', path: 'img/sample-chemistry.svg' },
+      { label: '🧬 Біологія', path: 'img/sample-biology.svg' },
       { label: '📖 Література', path: 'img/sample-literature.svg' }
     ];
 
     const dropZone = h('div', { class: 'image-upload-box' }, [
-      h('p', { style: 'margin:0 0 8px; font-weight:700;' }, [doc.createTextNode('🖼️ Перетягніть сюди фото завдання або креслення')]),
+      h('p', { style: 'margin:0 0 8px; font-weight:700;' }, [doc.createTextNode('🖼️ Перетягніть сюди фото завдання, вставте з буфера (Ctrl+V) або оберіть схему')]),
       h('button', {
         type: 'button', class: 'btn btn-small', text: '📁 Обрати файл із пристрою',
         onclick: () => fileInput.click()
@@ -734,22 +1189,27 @@
       }
     });
 
+    const imageError = h('div', { class: 'error-text', id: 'imageUrl-error' });
+    errorEls.imageUrl = imageError;
     const imageFieldBox = h('div', { class: 'field' }, [
       h('label', { text: 'Прикріплене зображення / схема' }),
       fields.imageUrl,
       dropZone,
-      h('div', { class: 'hint', text: 'Підтримуються фотографії конспектів, схеми, формули (PNG, JPG, SVG, WebP до 2 МБ)' })
+      h('div', { class: 'hint', text: 'Підтримуються фотографії конспектів, скріншоти (Ctrl+V), схеми, формули (PNG, JPG, SVG, WebP до 2 МБ)' }),
+      imageError
     ]);
 
     function showErrors(errors) {
       let first = null;
-      ['title', 'subject', 'dueDate', 'priority', 'description'].forEach((k) => {
+      ['title', 'subject', 'dueDate', 'priority', 'description', 'imageUrl'].forEach((k) => {
         const msg = errors[k];
         if (errorEls[k]) errorEls[k].textContent = msg || '';
         if (msg) {
           fields[k].setAttribute('aria-invalid', 'true');
           fields[k].setAttribute('aria-describedby', k + '-error');
-          if (!first) first = fields[k];
+          // приховане поле imageUrl не може отримати фокус — показуємо повідомлення сповіщенням
+          if (k === 'imageUrl') toast(msg, true);
+          else if (!first) first = fields[k];
         } else {
           fields[k].removeAttribute('aria-invalid');
           fields[k].removeAttribute('aria-describedby');
@@ -759,11 +1219,11 @@
     }
 
     const form = h('form', { class: 'form-grid', id: 'task-form', novalidate: true }, [
-      field('title', 'Назва завдання', 'До 100 символів', true),
-      field('subject', 'Предмет / Дисципліна', 'До 80 символів. Оберіть зі списку або введіть новий', true),
+      field('title', 'Назва завдання', 'До 100 символів', true, null, 100),
+      field('subject', 'Предмет / Дисципліна', 'До 80 символів. Оберіть зі списку або введіть новий', true, null, 80),
       field('dueDate', 'Дата виконання (дедлайн)', 'Формат ДД.ММ.РРРР', true, dateShortcuts),
       field('priority', 'Пріоритет', '', false),
-      field('description', 'Опис завдання', 'Необов’язково, до 1000 символів', false),
+      field('description', 'Опис завдання', 'Необов’язково, до 1000 символів', false, null, 1000),
       imageFieldBox,
       formError,
       h('div', { class: 'form-actions' }, [
@@ -771,6 +1231,22 @@
         h('a', { class: 'btn', id: 'cancel-btn', href: editing ? '#/task/' + id : '#/', text: 'Скасувати' })
       ])
     ]);
+
+    // Підтримка вставки зображення з буфера обміну (Ctrl+V) у формі
+    form.addEventListener('paste', (e) => {
+      const items = e.clipboardData && e.clipboardData.items;
+      if (!items) return;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf('image/') === 0) {
+          const blob = items[i].getAsFile();
+          if (blob) {
+            e.preventDefault();
+            setFromFile(blob);
+            break;
+          }
+        }
+      }
+    });
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -816,10 +1292,14 @@
     }
     const today = SP.todayISO();
     const overdue = t.isOverdue(today);
+    const chip = buildDeadlineChip(t, today);
     const dateDd = h('dd', {}, [h('span', { text: SP.Validator.formatDate(t.dueDate) })]);
     if (overdue) {
       dateDd.appendChild(doc.createTextNode(' '));
       dateDd.appendChild(badge('badge-overdue', 'Прострочено'));
+    } else if (chip) {
+      dateDd.appendChild(doc.createTextNode(' '));
+      dateDd.appendChild(chip);
     }
     const fmt = (iso) => new Date(iso).toLocaleString('uk-UA');
 
@@ -880,9 +1360,25 @@
       }
     });
 
+    const dupBtn = h('button', {
+      type: 'button',
+      class: 'btn',
+      text: '📋 Дублювати',
+      onclick: () => {
+        const res = manager.duplicateTask(t.id);
+        if (res.ok && res.task) {
+          toast('Створено копію завдання 📋', false);
+          global.location.hash = '#/task/' + res.task.id;
+        } else {
+          toast(res.error, true);
+        }
+      }
+    });
+
     const actions = h('div', { class: 'form-actions', style: 'margin-top:20px;' }, [
       quickToggleBtn,
       h('a', { class: 'btn', href: '#/edit/' + t.id, text: '✏️ Редагувати' }),
+      dupBtn,
       h('button', { type: 'button', class: 'btn btn-danger', id: 'detail-delete', text: '🗑️ Видалити', onclick: () => doDelete(t, true) }),
       h('a', { class: 'btn', href: '#/', text: '📋 До списку' })
     ]);
@@ -919,6 +1415,7 @@
     const backupClose = doc.getElementById('backup-close');
     const backupDone = doc.getElementById('backup-done');
     const btnExport = doc.getElementById('btn-export-download');
+    const btnExportCsv = doc.getElementById('btn-export-csv');
     const btnImport = doc.getElementById('btn-import-run');
     const backupFileInput = doc.getElementById('backup-file-input');
 
@@ -935,12 +1432,28 @@
         const url = URL.createObjectURL(blob);
         const a = doc.createElement('a');
         a.href = url;
-        a.download = 'studyplanner-backup-v1.6.json';
+        a.download = 'studyplanner-backup-v1.6-b171-RS2.json';
         doc.body.appendChild(a);
         a.click();
         doc.body.removeChild(a);
         URL.revokeObjectURL(url);
-        toast('Файл резервної копії v1.6 завантажено', false);
+        toast('Файл резервної копії v1.6 RS2 завантажено', false);
+      });
+    }
+
+    if (btnExportCsv) {
+      btnExportCsv.addEventListener('click', () => {
+        const csv = manager.exportCSV();
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = doc.createElement('a');
+        a.href = url;
+        a.download = 'studyplanner-tasks-v1.6-RS2.csv';
+        doc.body.appendChild(a);
+        a.click();
+        doc.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        toast('Таблицю CSV (Excel) завантажено 📊', false);
       });
     }
 
@@ -967,17 +1480,41 @@
       });
     }
 
-    // Клавіша Esc для закриття діалогів, '?' для довідки
+    // Гарячі клавіші RS2: '?' — довідка, '/' або Ctrl+K — пошук, 'N' — нове завдання, 'T' — зміна теми
     global.addEventListener('keydown', (e) => {
-      if (e.key === '?' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
+      const inInput = ['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName) || e.target.isContentEditable;
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        const searchInput = doc.getElementById('f-query');
+        if (searchInput) {
+          e.preventDefault();
+          searchInput.focus();
+          searchInput.select();
+        }
+        return;
+      }
+      if (inInput) return;
+      if (e.key === '?') {
         e.preventDefault();
         openAbout();
+      } else if (e.key === '/') {
+        const searchInput = doc.getElementById('f-query');
+        if (searchInput) {
+          e.preventDefault();
+          searchInput.focus();
+        }
+      } else if (e.key.toLowerCase() === 'n' && !e.ctrlKey && !e.altKey && !e.metaKey) {
+        e.preventDefault();
+        global.location.hash = '#/new';
+      } else if (e.key.toLowerCase() === 't' && !e.ctrlKey && !e.altKey && !e.metaKey) {
+        e.preventDefault();
+        cycleTheme();
       }
     });
   }
 
   // Ініціалізація
   initTheme();
+  initPomodoro();
   initModals();
   global.addEventListener('hashchange', route);
   if (doc.readyState === 'loading') {
