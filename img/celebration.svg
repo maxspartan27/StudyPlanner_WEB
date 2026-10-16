@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 220" width="320" height="220" fill="none">
+  <defs>
+    <linearGradient id="cupGrad" x1="120" y1="50" x2="200" y2="150" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="50%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <linearGradient id="starGrad" x1="0" y1="0" x2="20" y2="20" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#fde047"/>
+      <stop offset="100%" stop-color="#ca8a04"/>
+    </linearGradient>
+    <filter id="cupGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#f59e0b" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Base shadow -->
+  <ellipse cx="160" cy="195" rx="80" ry="10" fill="#cbd5e1" opacity="0.6"/>
+
+  <!-- Confetti particles (green, red, blue, purple, yellow) -->
+  <circle cx="60" cy="50" r="4" fill="#10b981"/>
+  <rect x="85" y="30" width="6" height="12" rx="2" fill="#ef4444" transform="rotate(25 85 30)"/>
+  <circle cx="250" cy="45" r="5" fill="#3b82f6"/>
+  <rect x="225" y="25" width="8" height="10" rx="2" fill="#8b5cf6" transform="rotate(-35 225 25)"/>
+  <rect x="50" y="110" width="10" height="6" rx="2" fill="#f59e0b" transform="rotate(40 50 110)"/>
+  <circle cx="270" cy="100" r="4.5" fill="#10b981"/>
+  <rect x="245" y="130" width="7" height="11" rx="2" fill="#ef4444" transform="rotate(15 245 130)"/>
+  <circle cx="75" cy="160" r="3.5" fill="#06b6d4"/>
+  <rect x="95" y="80" width="8" height="8" rx="2" fill="#ec4899" transform="rotate(-20 95 80)"/>
+
+  <!-- Stars -->
+  <path d="M160 15L163 25L173 28L163 31L160 41L157 31L147 28L157 25Z" fill="url(#starGrad)"/>
+  <path d="M100 55L102 62L109 64L102 66L100 73L98 66L91 64L98 62Z" fill="#fbbf24"/>
+  <path d="M220 55L222 62L229 64L222 66L220 73L218 66L211 64L218 62Z" fill="#fbbf24"/>
+
+  <!-- Trophy Cup -->
+  <g filter="url(#cupGlow)">
+    <!-- Handles -->
+    <path d="M120 75H105C96 75 90 82 92 92C95 106 108 116 122 118" stroke="#f59e0b" stroke-width="8" stroke-linecap="round" fill="none"/>
+    <path d="M200 75H215C224 75 230 82 228 92C225 106 212 116 198 118" stroke="#f59e0b" stroke-width="8" stroke-linecap="round" fill="none"/>
+
+    <!-- Cup Body -->
+    <path d="M115 55H205V95C205 120 185 140 160 140C135 140 115 120 115 95V55Z" fill="url(#cupGrad)"/>
+    <!-- Rim -->
+    <rect x="110" y="50" width="100" height="10" rx="5" fill="#fde047"/>
+
+    <!-- Star emblem on cup -->
+    <polygon points="160,82 164,92 175,93 167,100 170,111 160,105 150,111 153,100 145,93 156,92" fill="#ffffff" opacity="0.9"/>
+
+    <!-- Stem & Base -->
+    <rect x="152" y="140" width="16" height="25" fill="#d97706"/>
+    <path d="M140 165H180L186 182C187 185 184 188 180 188H140C136 188 133 185 134 182L140 165Z" fill="#b45309"/>
+    <rect x="130" y="186" width="60" height="8" rx="3" fill="#78350f"/>
+    <!-- 100% Badge on Base -->
+    <rect x="144" y="172" width="32" height="12" rx="3" fill="#10b981"/>
+    <text x="160" y="181" font-family="sans-serif" font-weight="bold" font-size="9" fill="#ffffff" text-anchor="middle">100%</text>
+  </g>
+</svg>
+
