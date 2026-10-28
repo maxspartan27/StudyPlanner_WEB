@@ -1,0 +1,665 @@
+/* ==========================================================================
+   StudyPlanner v2.1.7 (build 217) Redstone 5 — Theme & Zero-Lag Wallpaper Engine (themes.css)
+   Автор: Максим Ковалишин | © 2026 Всі права захищені
+   16 Кольорових та HD Фото-тем + Оптимізований GPU Glass-шар без overdraw + Turbo Mode
+   ========================================================================== */
+
+/* 1. Базові дизайн-токени та Тема 1: Light (Класична лазур) */
+:root, [data-theme="light"] {
+  --bg: #f1f5f9;
+  --surface: #ffffff;
+  --surface-glass: rgba(255, 255, 255, 0.88);
+  --surface-card: rgba(241, 245, 249, 0.93);
+  --surface-alt: #f8fafc;
+  --surface-highlight: rgba(255, 255, 255, 0.72);
+  --text: #0f172a;
+  --text-secondary: #334155;
+  --muted: #64748b;
+  --border: rgba(148, 163, 184, 0.36);
+  --border-hover: #94a3b8;
+  --primary: #2563eb;
+  --primary-accent: #4f46e5;
+  --primary-light: rgba(37, 99, 235, 0.13);
+  --primary-dark: #1d4ed8;
+  --primary-ring: rgba(37, 99, 235, 0.28);
+  --accent-glow: rgba(37, 99, 235, 0.36);
+  --danger: #dc2626;
+  --danger-accent: #e11d48;
+  --danger-light: rgba(220, 38, 38, 0.12);
+  --danger-glow: rgba(220, 38, 38, 0.38);
+  --ok: #16a34a;
+  --ok-light: rgba(22, 163, 74, 0.13);
+  --ok-glow: rgba(22, 163, 74, 0.38);
+  --warn: #d97706;
+  --warn-light: rgba(217, 119, 6, 0.14);
+  --focus: #f59e0b;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --shadow-sm: 0 2px 8px -2px rgba(15, 23, 42, 0.07);
+  --shadow-md: 0 10px 24px -6px rgba(15, 23, 42, 0.12);
+  --shadow-lg: 0 20px 42px -8px rgba(15, 23, 42, 0.20);
+  --active-wallpaper: url("../img/web/wall-light.jpg");
+  --wallpaper-dim: 0.58;
+  --wallpaper-blur: 3px;
+  --glass-blur: 12px;
+  --theme-name: "Класична лазур";
+}
+
+/* Тема 2: Deep Dark (Глибокий космос) */
+[data-theme="dark"] {
+  --bg: #0b1120;
+  --surface: #1e293b;
+  --surface-glass: rgba(15, 23, 42, 0.87);
+  --surface-card: rgba(30, 41, 59, 0.86);
+  --surface-alt: #162032;
+  --surface-highlight: rgba(255, 255, 255, 0.09);
+  --text: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --muted: #94a3b8;
+  --border: rgba(148, 163, 184, 0.24);
+  --border-hover: #60a5fa;
+  --primary: #3b82f6;
+  --primary-accent: #6366f1;
+  --primary-light: rgba(59, 130, 246, 0.2);
+  --primary-dark: #2563eb;
+  --primary-ring: rgba(59, 130, 246, 0.38);
+  --accent-glow: rgba(59, 130, 246, 0.45);
+  --danger: #ef4444;
+  --danger-accent: #f43f5e;
+  --danger-light: rgba(239, 68, 68, 0.2);
+  --danger-glow: rgba(239, 68, 68, 0.48);
+  --ok: #22c55e;
+  --ok-light: rgba(34, 197, 94, 0.2);
+  --ok-glow: rgba(34, 197, 94, 0.48);
+  --warn: #fbbf24;
+  --warn-light: rgba(245, 158, 11, 0.2);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.42);
+  --shadow-md: 0 10px 26px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 20px 42px rgba(0, 0, 0, 0.65);
+  --active-wallpaper: url("../img/web/wall-dark.jpg");
+  --theme-name: "Глибокий космос";
+}
+
+/* Тема 3: Oceanic Breeze (Океанський бриз) */
+[data-theme="ocean"] {
+  --bg: #e0f2fe;
+  --surface: #ffffff;
+  --surface-glass: rgba(240, 249, 255, 0.89);
+  --surface-card: rgba(224, 242, 254, 0.88);
+  --surface-alt: #f0f9ff;
+  --surface-highlight: rgba(255, 255, 255, 0.76);
+  --text: #082f49;
+  --text-secondary: #0c4a6e;
+  --muted: #0369a1;
+  --border: rgba(14, 165, 233, 0.32);
+  --border-hover: #0284c7;
+  --primary: #0284c7;
+  --primary-accent: #0891b2;
+  --primary-light: rgba(2, 132, 199, 0.15);
+  --primary-dark: #0369a1;
+  --primary-ring: rgba(2, 132, 199, 0.32);
+  --accent-glow: rgba(14, 165, 233, 0.44);
+  --danger: #e11d48;
+  --danger-accent: #be123c;
+  --danger-light: rgba(225, 29, 72, 0.13);
+  --danger-glow: rgba(225, 29, 72, 0.4);
+  --ok: #0d9488;
+  --ok-light: rgba(13, 148, 136, 0.15);
+  --ok-glow: rgba(13, 148, 136, 0.4);
+  --warn: #d97706;
+  --warn-light: rgba(217, 119, 6, 0.15);
+  --active-wallpaper: url("../img/web/wall-ocean.jpg");
+  --theme-name: "Океанський бриз";
+}
+
+/* Тема 4: Emerald Nature (Смарагд & Природа) */
+[data-theme="emerald"] {
+  --bg: #04241b;
+  --surface: #0a3d2e;
+  --surface-glass: rgba(6, 42, 31, 0.87);
+  --surface-card: rgba(10, 61, 46, 0.86);
+  --surface-alt: #0e4b39;
+  --surface-highlight: rgba(167, 243, 208, 0.12);
+  --text: #ecfdf5;
+  --text-secondary: #a7f3d0;
+  --muted: #6ee7b7;
+  --border: rgba(52, 211, 153, 0.28);
+  --border-hover: #10b981;
+  --primary: #10b981;
+  --primary-accent: #059669;
+  --primary-light: rgba(16, 185, 129, 0.22);
+  --primary-dark: #059669;
+  --primary-ring: rgba(16, 185, 129, 0.42);
+  --accent-glow: rgba(16, 185, 129, 0.52);
+  --danger: #f43f5e;
+  --danger-accent: #e11d48;
+  --danger-light: rgba(244, 63, 94, 0.22);
+  --danger-glow: rgba(251, 113, 133, 0.5);
+  --ok: #34d399;
+  --ok-light: rgba(52, 211, 153, 0.22);
+  --ok-glow: rgba(52, 211, 153, 0.52);
+  --warn: #fbbf24;
+  --warn-light: rgba(251, 191, 36, 0.2);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.38);
+  --shadow-md: 0 10px 24px rgba(0, 0, 0, 0.48);
+  --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.62);
+  --active-wallpaper: url("../img/web/wall-emerald.jpg");
+  --theme-name: "Смарагд & Природа";
+}
+
+/* Тема 5: Japanese Matcha (Японська матча) */
+[data-theme="matcha"] {
+  --bg: #ecfdf5;
+  --surface: #ffffff;
+  --surface-glass: rgba(240, 253, 244, 0.90);
+  --surface-card: rgba(220, 252, 231, 0.86);
+  --surface-alt: #f0fdf4;
+  --surface-highlight: rgba(255, 255, 255, 0.78);
+  --text: #052e16;
+  --text-secondary: #14532d;
+  --muted: #15803d;
+  --border: rgba(22, 163, 74, 0.28);
+  --border-hover: #16a34a;
+  --primary: #15803d;
+  --primary-accent: #0d9488;
+  --primary-light: rgba(22, 163, 74, 0.15);
+  --primary-dark: #166534;
+  --primary-ring: rgba(22, 163, 74, 0.32);
+  --accent-glow: rgba(34, 197, 94, 0.40);
+  --danger: #dc2626;
+  --danger-accent: #b91c1c;
+  --danger-light: rgba(220, 38, 38, 0.12);
+  --danger-glow: rgba(220, 38, 38, 0.38);
+  --ok: #16a34a;
+  --ok-light: rgba(22, 163, 74, 0.16);
+  --ok-glow: rgba(22, 163, 74, 0.40);
+  --warn: #ca8a04;
+  --warn-light: rgba(202, 138, 4, 0.15);
+  --active-wallpaper: url("../img/web/wall-matcha.jpg");
+  --theme-name: "Японська матча";
+}
+
+/* Тема 6: Lavender Amethyst (Лавандовий аметист) */
+[data-theme="lavender"] {
+  --bg: #f5f3ff;
+  --surface: #ffffff;
+  --surface-glass: rgba(250, 245, 255, 0.90);
+  --surface-card: rgba(237, 233, 254, 0.87);
+  --surface-alt: #faf5ff;
+  --surface-highlight: rgba(255, 255, 255, 0.78);
+  --text: #2e1065;
+  --text-secondary: #4c1d95;
+  --muted: #6d28d9;
+  --border: rgba(139, 92, 246, 0.3);
+  --border-hover: #7c3aed;
+  --primary: #7c3aed;
+  --primary-accent: #9333ea;
+  --primary-light: rgba(124, 58, 237, 0.14);
+  --primary-dark: #6d28d9;
+  --primary-ring: rgba(124, 58, 237, 0.32);
+  --accent-glow: rgba(139, 92, 246, 0.44);
+  --danger: #e11d48;
+  --danger-accent: #be123c;
+  --danger-light: rgba(225, 29, 72, 0.12);
+  --danger-glow: rgba(225, 29, 72, 0.38);
+  --ok: #059669;
+  --ok-light: rgba(5, 150, 105, 0.14);
+  --ok-glow: rgba(5, 150, 105, 0.4);
+  --warn: #d97706;
+  --warn-light: rgba(217, 119, 6, 0.15);
+  --active-wallpaper: url("../img/web/wall-lavender.jpg");
+  --theme-name: "Лавандовий аметист";
+}
+
+/* Тема 7: Sakura Blossom (Квітуча сакура) */
+[data-theme="sakura"] {
+  --bg: #fdf2f8;
+  --surface: #ffffff;
+  --surface-glass: rgba(255, 245, 250, 0.90);
+  --surface-card: rgba(252, 231, 243, 0.87);
+  --surface-alt: #fff1f2;
+  --surface-highlight: rgba(255, 255, 255, 0.80);
+  --text: #500724;
+  --text-secondary: #831843;
+  --muted: #9d174d;
+  --border: rgba(244, 114, 182, 0.38);
+  --border-hover: #db2777;
+  --primary: #db2777;
+  --primary-accent: #e11d48;
+  --primary-light: rgba(219, 39, 119, 0.14);
+  --primary-dark: #be185d;
+  --primary-ring: rgba(219, 39, 119, 0.32);
+  --accent-glow: rgba(236, 72, 153, 0.44);
+  --danger: #e11d48;
+  --danger-accent: #be123c;
+  --danger-light: rgba(225, 29, 72, 0.14);
+  --danger-glow: rgba(225, 29, 72, 0.42);
+  --ok: #16a34a;
+  --ok-light: rgba(22, 163, 74, 0.14);
+  --ok-glow: rgba(22, 163, 74, 0.4);
+  --warn: #d97706;
+  --warn-light: rgba(217, 119, 6, 0.15);
+  --active-wallpaper: url("../img/web/wall-sakura.jpg");
+  --theme-name: "Квітуча сакура";
+}
+
+/* Тема 8: Arctic Aurora (Арктичне сяйво) */
+[data-theme="aurora"] {
+  --bg: #041e2b;
+  --surface: #092c3e;
+  --surface-glass: rgba(6, 33, 48, 0.87);
+  --surface-card: rgba(9, 44, 62, 0.86);
+  --surface-alt: #0d3b52;
+  --surface-highlight: rgba(153, 246, 228, 0.12);
+  --text: #f0fdfa;
+  --text-secondary: #99f6e4;
+  --muted: #5eead4;
+  --border: rgba(45, 212, 191, 0.3);
+  --border-hover: #2dd4bf;
+  --primary: #0d9488;
+  --primary-accent: #0284c7;
+  --primary-light: rgba(20, 184, 166, 0.22);
+  --primary-dark: #0f766e;
+  --primary-ring: rgba(45, 212, 191, 0.42);
+  --accent-glow: rgba(45, 212, 191, 0.55);
+  --danger: #f43f5e;
+  --danger-accent: #e11d48;
+  --danger-light: rgba(251, 113, 133, 0.22);
+  --danger-glow: rgba(251, 113, 133, 0.52);
+  --ok: #34d399;
+  --ok-light: rgba(52, 211, 153, 0.22);
+  --ok-glow: rgba(52, 211, 153, 0.55);
+  --warn: #38bdf8;
+  --warn-light: rgba(56, 189, 248, 0.22);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 10px 26px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 20px 42px rgba(0, 0, 0, 0.64);
+  --active-wallpaper: url("../img/web/wall-aurora.jpg");
+  --theme-name: "Арктичне сяйво";
+}
+
+/* Тема 9: Ruby Crimson (Рубінове полум'я) */
+[data-theme="crimson"] {
+  --bg: #1a050a;
+  --surface: #2b0b14;
+  --surface-glass: rgba(31, 7, 14, 0.87);
+  --surface-card: rgba(43, 11, 20, 0.86);
+  --surface-alt: #360e19;
+  --surface-highlight: rgba(254, 205, 211, 0.11);
+  --text: #fff1f2;
+  --text-secondary: #fecdd3;
+  --muted: #fda4af;
+  --border: rgba(244, 63, 94, 0.32);
+  --border-hover: #fb7185;
+  --primary: #e11d48;
+  --primary-accent: #f43f5e;
+  --primary-light: rgba(244, 63, 94, 0.22);
+  --primary-dark: #be123c;
+  --primary-ring: rgba(244, 63, 94, 0.42);
+  --accent-glow: rgba(244, 63, 94, 0.52);
+  --danger: #ff4d6d;
+  --danger-accent: #e11d48;
+  --danger-light: rgba(255, 77, 109, 0.24);
+  --danger-glow: rgba(255, 77, 109, 0.55);
+  --ok: #34d399;
+  --ok-light: rgba(52, 211, 153, 0.22);
+  --ok-glow: rgba(52, 211, 153, 0.5);
+  --warn: #fbbf24;
+  --warn-light: rgba(251, 191, 36, 0.22);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.42);
+  --shadow-md: 0 10px 26px rgba(0, 0, 0, 0.52);
+  --shadow-lg: 0 20px 42px rgba(0, 0, 0, 0.66);
+  --active-wallpaper: url("../img/web/wall-crimson.jpg");
+  --theme-name: "Рубінове полум'я";
+}
+
+/* Тема 10: Sunset Amber (Золотий бурштин) */
+[data-theme="amber"] {
+  --bg: #1c1103;
+  --surface: #2b1b07;
+  --surface-glass: rgba(30, 18, 4, 0.87);
+  --surface-card: rgba(43, 27, 7, 0.86);
+  --surface-alt: #38240a;
+  --surface-highlight: rgba(253, 230, 138, 0.12);
+  --text: #fffbeb;
+  --text-secondary: #fde68a;
+  --muted: #fcd34d;
+  --border: rgba(245, 158, 11, 0.32);
+  --border-hover: #fbbf24;
+  --primary: #d97706;
+  --primary-accent: #ea580c;
+  --primary-light: rgba(245, 158, 11, 0.22);
+  --primary-dark: #b45309;
+  --primary-ring: rgba(245, 158, 11, 0.45);
+  --accent-glow: rgba(245, 158, 11, 0.52);
+  --danger: #ef4444;
+  --danger-accent: #dc2626;
+  --danger-light: rgba(248, 113, 113, 0.22);
+  --danger-glow: rgba(239, 68, 68, 0.52);
+  --ok: #34d399;
+  --ok-light: rgba(52, 211, 153, 0.22);
+  --ok-glow: rgba(52, 211, 153, 0.52);
+  --warn: #fbbf24;
+  --warn-light: rgba(245, 158, 11, 0.24);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.42);
+  --shadow-md: 0 10px 26px rgba(0, 0, 0, 0.52);
+  --shadow-lg: 0 20px 42px rgba(0, 0, 0, 0.66);
+  --active-wallpaper: url("../img/web/wall-amber.jpg");
+  --theme-name: "Золотий бурштин";
+}
+
+/* Тема 11: Cyberpunk Neon (Кіберпанк Неон) */
+[data-theme="neon"] {
+  --bg: #090414;
+  --surface: #150d28;
+  --surface-glass: rgba(15, 7, 31, 0.87);
+  --surface-card: rgba(25, 13, 48, 0.86);
+  --surface-alt: #1c1136;
+  --surface-highlight: rgba(103, 232, 249, 0.14);
+  --text: #fdf4ff;
+  --text-secondary: #f0abfc;
+  --muted: #c084fc;
+  --border: rgba(6, 182, 212, 0.36);
+  --border-hover: #22d3ee;
+  --primary: #0891b2;
+  --primary-accent: #7c3aed;
+  --primary-light: rgba(6, 182, 212, 0.22);
+  --primary-dark: #0e7490;
+  --primary-ring: rgba(6, 182, 212, 0.48);
+  --accent-glow: rgba(6, 182, 212, 0.6);
+  --danger: #f43f5e;
+  --danger-accent: #e11d48;
+  --danger-light: rgba(244, 63, 94, 0.25);
+  --danger-glow: rgba(244, 63, 94, 0.6);
+  --ok: #10b981;
+  --ok-light: rgba(16, 185, 129, 0.24);
+  --ok-glow: rgba(16, 185, 129, 0.6);
+  --warn: #fbbf24;
+  --warn-light: rgba(245, 158, 11, 0.24);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.46);
+  --shadow-md: 0 10px 26px rgba(0, 0, 0, 0.56);
+  --shadow-lg: 0 20px 44px rgba(0, 0, 0, 0.7);
+  --active-wallpaper: url("../img/web/wall-neon.jpg");
+  --theme-name: "Кіберпанк Неон";
+}
+
+/* Тема 12: Ultraviolet Galaxy (Ультрафіолетова галактика) */
+[data-theme="cosmos"] {
+  --bg: #0c0724;
+  --surface: #18123b;
+  --surface-glass: rgba(16, 11, 44, 0.87);
+  --surface-card: rgba(28, 21, 68, 0.86);
+  --surface-alt: #241b57;
+  --surface-highlight: rgba(221, 214, 254, 0.13);
+  --text: #f5f3ff;
+  --text-secondary: #ddd6fe;
+  --muted: #a78bfa;
+  --border: rgba(139, 92, 246, 0.36);
+  --border-hover: #c084fc;
+  --primary: #7c3aed;
+  --primary-accent: #db2777;
+  --primary-light: rgba(139, 92, 246, 0.24);
+  --primary-dark: #6d28d9;
+  --primary-ring: rgba(139, 92, 246, 0.48);
+  --accent-glow: rgba(168, 85, 247, 0.58);
+  --danger: #f43f5e;
+  --danger-accent: #e11d48;
+  --danger-light: rgba(251, 113, 133, 0.24);
+  --danger-glow: rgba(251, 113, 133, 0.55);
+  --ok: #34d399;
+  --ok-light: rgba(52, 211, 153, 0.22);
+  --ok-glow: rgba(52, 211, 153, 0.55);
+  --warn: #fbbf24;
+  --warn-light: rgba(251, 191, 36, 0.22);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 10px 26px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 20px 44px rgba(0, 0, 0, 0.68);
+  --active-wallpaper: url("../img/web/wall-cosmos.jpg");
+  --theme-name: "Ультрафіолетова галактика";
+}
+
+/* Тема 13: Nordic Fjord (Скандинавський фйорд) */
+[data-theme="nordic"] {
+  --bg: #eef6fa;
+  --surface: #ffffff;
+  --surface-glass: rgba(244, 250, 253, 0.90);
+  --surface-card: rgba(226, 238, 246, 0.88);
+  --surface-alt: #f4f9fc;
+  --surface-highlight: rgba(255, 255, 255, 0.80);
+  --text: #0f293a;
+  --text-secondary: #1e4258;
+  --muted: #4b6b80;
+  --border: rgba(56, 130, 172, 0.30);
+  --border-hover: #0369a1;
+  --primary: #0369a1;
+  --primary-accent: #0f766e;
+  --primary-light: rgba(3, 105, 161, 0.14);
+  --primary-dark: #075985;
+  --primary-ring: rgba(3, 105, 161, 0.30);
+  --accent-glow: rgba(14, 165, 233, 0.40);
+  --danger: #dc2626;
+  --danger-accent: #be123c;
+  --danger-light: rgba(220, 38, 38, 0.12);
+  --danger-glow: rgba(220, 38, 38, 0.36);
+  --ok: #0f766e;
+  --ok-light: rgba(15, 118, 110, 0.14);
+  --ok-glow: rgba(15, 118, 110, 0.38);
+  --warn: #d97706;
+  --warn-light: rgba(217, 119, 6, 0.14);
+  --active-wallpaper: url("../img/web/wall-nordic.jpg");
+  --theme-name: "Скандинавський фйорд";
+}
+
+/* Тема 14: Peach Sunrise (Персиковий світанок) */
+[data-theme="peach"] {
+  --bg: #fff7ed;
+  --surface: #ffffff;
+  --surface-glass: rgba(255, 250, 244, 0.90);
+  --surface-card: rgba(255, 237, 213, 0.86);
+  --surface-alt: #fffaf5;
+  --surface-highlight: rgba(255, 255, 255, 0.82);
+  --text: #431407;
+  --text-secondary: #7c2d12;
+  --muted: #9a3412;
+  --border: rgba(249, 115, 22, 0.30);
+  --border-hover: #ea580c;
+  --primary: #ea580c;
+  --primary-accent: #e11d48;
+  --primary-light: rgba(234, 88, 12, 0.14);
+  --primary-dark: #c2410c;
+  --primary-ring: rgba(234, 88, 12, 0.30);
+  --accent-glow: rgba(249, 115, 22, 0.42);
+  --danger: #dc2626;
+  --danger-accent: #b91c1c;
+  --danger-light: rgba(220, 38, 38, 0.13);
+  --danger-glow: rgba(220, 38, 38, 0.38);
+  --ok: #15803d;
+  --ok-light: rgba(21, 128, 61, 0.14);
+  --ok-glow: rgba(21, 128, 61, 0.38);
+  --warn: #d97706;
+  --warn-light: rgba(217, 119, 6, 0.16);
+  --active-wallpaper: url("../img/web/wall-peach.jpg");
+  --theme-name: "Персиковий світанок";
+}
+
+/* Тема 15: Obsidian Gold (Обсидіан & Золото) */
+[data-theme="obsidian"] {
+  --bg: #09090b;
+  --surface: #18181b;
+  --surface-glass: rgba(18, 18, 22, 0.89);
+  --surface-card: rgba(28, 28, 34, 0.88);
+  --surface-alt: #222227;
+  --surface-highlight: rgba(250, 204, 21, 0.14);
+  --text: #fafafa;
+  --text-secondary: #e4e4e7;
+  --muted: #a1a1aa;
+  --border: rgba(234, 179, 8, 0.30);
+  --border-hover: #eab308;
+  --primary: #ca8a04;
+  --primary-accent: #d97706;
+  --primary-light: rgba(234, 179, 8, 0.20);
+  --primary-dark: #a16207;
+  --primary-ring: rgba(234, 179, 8, 0.40);
+  --accent-glow: rgba(234, 179, 8, 0.50);
+  --danger: #ef4444;
+  --danger-accent: #dc2626;
+  --danger-light: rgba(239, 68, 68, 0.22);
+  --danger-glow: rgba(239, 68, 68, 0.50);
+  --ok: #22c55e;
+  --ok-light: rgba(34, 197, 94, 0.20);
+  --ok-glow: rgba(34, 197, 94, 0.48);
+  --warn: #eab308;
+  --warn-light: rgba(234, 179, 8, 0.22);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 10px 26px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 20px 44px rgba(0, 0, 0, 0.75);
+  --active-wallpaper: url("../img/web/wall-obsidian.jpg");
+  --theme-name: "Обсидіан & Золото";
+}
+
+/* Тема 16: Autumn Canyon (Осінній каньйон) */
+[data-theme="forest"] {
+  --bg: #170e0a;
+  --surface: #261710;
+  --surface-glass: rgba(28, 17, 12, 0.88);
+  --surface-card: rgba(41, 25, 17, 0.87);
+  --surface-alt: #331f15;
+  --surface-highlight: rgba(253, 186, 116, 0.13);
+  --text: #fff7ed;
+  --text-secondary: #fed7aa;
+  --muted: #fdba74;
+  --border: rgba(249, 115, 22, 0.30);
+  --border-hover: #fb923c;
+  --primary: #ea580c;
+  --primary-accent: #d97706;
+  --primary-light: rgba(249, 115, 22, 0.22);
+  --primary-dark: #c2410c;
+  --primary-ring: rgba(249, 115, 22, 0.42);
+  --accent-glow: rgba(249, 115, 22, 0.52);
+  --danger: #ef4444;
+  --danger-accent: #dc2626;
+  --danger-light: rgba(239, 68, 68, 0.22);
+  --danger-glow: rgba(239, 68, 68, 0.50);
+  --ok: #22c55e;
+  --ok-light: rgba(34, 197, 94, 0.20);
+  --ok-glow: rgba(34, 197, 94, 0.48);
+  --warn: #fbbf24;
+  --warn-light: rgba(251, 191, 36, 0.22);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.46);
+  --shadow-md: 0 10px 26px rgba(0, 0, 0, 0.56);
+  --shadow-lg: 0 20px 44px rgba(0, 0, 0, 0.70);
+  --active-wallpaper: url("../img/web/wall-forest.jpg");
+  --theme-name: "Осінній каньйон";
+}
+
+/* ==========================================================================
+   2. Єдиний GPU-композитний шар шпалер без overdraw (v2.1.7 Redstone 5 Zero-Lag Engine)
+   ========================================================================== */
+#site-wallpaper-layer {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background-image: var(--active-wallpaper);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(var(--wallpaper-blur, 3px)) saturate(1.08);
+  transform: scale3d(1.04, 1.04, 1);
+  backface-visibility: hidden;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+
+#site-wallpaper-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--bg);
+  opacity: var(--wallpaper-dim, 0.58);
+  transition: background 0.3s ease, opacity 0.28s ease;
+  pointer-events: none;
+}
+
+/* Режим чистої кольорової теми (без фонового фото) */
+[data-visual-mode="color"] #site-wallpaper-layer {
+  opacity: 0;
+}
+[data-visual-mode="color"] #site-wallpaper-overlay {
+  opacity: 1;
+  background: var(--bg);
+}
+
+/* Режим живого кольорового градієнта (Mesh Aurora Glow) */
+[data-visual-mode="mesh"] #site-wallpaper-layer {
+  opacity: 0;
+}
+[data-visual-mode="mesh"] #site-wallpaper-overlay {
+  opacity: 1;
+  background:
+    radial-gradient(circle at 15% 18%, var(--primary-ring) 0%, transparent 45%),
+    radial-gradient(circle at 86% 22%, var(--ok-light) 0%, transparent 42%),
+    radial-gradient(circle at 52% 85%, var(--warn-light) 0%, transparent 48%),
+    var(--bg);
+}
+
+/* Справжній backdrop-filter лише на плаваючих/закріплених елементах (нуль лагів при скролі!) */
+[data-visual-mode="photo"] .site-header,
+[data-visual-mode="photo"] .active-theme-banner,
+[data-visual-mode="photo"] .theme-picker-popover,
+[data-visual-mode="photo"] #command-palette-dialog,
+[data-visual-mode="photo"] .studio-card {
+  background: var(--surface-glass);
+  backdrop-filter: blur(var(--glass-blur, 12px));
+  -webkit-backdrop-filter: blur(var(--glass-blur, 12px));
+}
+
+/* Оптимізовані напівпрозорі картки зі світловим відблиском без каскадного blur-overdraw */
+[data-visual-mode="photo"] .panel,
+[data-visual-mode="photo"] .stat-card,
+[data-visual-mode="photo"] .progress-container,
+[data-visual-mode="photo"] .pomodoro-widget,
+[data-visual-mode="photo"] .task-card,
+[data-visual-mode="photo"] .table-wrap,
+[data-visual-mode="photo"] .smart-table-shell,
+[data-visual-mode="photo"] .kanban-column,
+[data-visual-mode="photo"] .calendar-panel,
+[data-visual-mode="photo"] .theme-card,
+[data-visual-mode="photo"] .analytics-card,
+[data-visual-mode="photo"] .article-hero-banner,
+[data-visual-mode="photo"] .article-card,
+[data-visual-mode="photo"] .site-footer {
+  background: var(--surface-glass);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 var(--surface-highlight);
+}
+
+/* ⚡ Турбо-режим максимального прискорення (data-perf="turbo") */
+[data-perf="turbo"] #site-wallpaper-layer {
+  filter: none !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+[data-perf="turbo"] .site-header,
+[data-perf="turbo"] .active-theme-banner,
+[data-perf="turbo"] .theme-picker-popover,
+[data-perf="turbo"] #command-palette-dialog,
+[data-perf="turbo"] .studio-card,
+[data-perf="turbo"] dialog::backdrop {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+[data-perf="turbo"] *,
+[data-perf="turbo"] *::before,
+[data-perf="turbo"] *::after {
+  animation-duration: 0.01ms !important;
+  transition-duration: 0.06s !important;
+}
+
+/* Доступність та оптимізація енергоспоживання при prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" width="320" height="180" fill="none">
+  <defs>
+    <linearGradient id="mtBg" x1="0" y1="0" x2="320" y2="180" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f0fdf4"/>
+      <stop offset="55%" stop-color="#dcfce7"/>
+      <stop offset="100%" stop-color="#bbf7d0"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" rx="14" fill="url(#mtBg)"/>
+  <circle cx="272" cy="36" r="28" fill="#86efac" opacity="0.5"/>
+  <circle cx="42" cy="148" r="34" fill="#6ee7b7" opacity="0.4"/>
+  <rect x="28" y="42" width="264" height="114" rx="10" fill="#ffffff" fill-opacity="0.96" stroke="#86efac" stroke-width="2"/>
+  <rect x="28" y="42" width="264" height="24" rx="10" fill="#ecfdf5"/>
+  <circle cx="42" cy="54" r="4" fill="#ef4444"/>
+  <circle cx="54" cy="54" r="4" fill="#eab308"/>
+  <circle cx="66" cy="54" r="4" fill="#16a34a"/>
+  <rect x="206" y="49" width="72" height="10" rx="5" fill="#15803d"/>
+  <rect x="42" y="78" width="74" height="32" rx="6" fill="#f0fdf4" stroke="#86efac"/>
+  <rect x="50" y="86" width="40" height="6" rx="3" fill="#16a34a"/>
+  <rect x="124" y="78" width="74" height="32" rx="6" fill="#ecfccb" stroke="#bef264"/>
+  <rect x="132" y="86" width="40" height="6" rx="3" fill="#65a30d"/>
+  <rect x="206" y="78" width="72" height="32" rx="6" fill="#ccfbf1" stroke="#5eead4"/>
+  <rect x="214" y="86" width="36" height="6" rx="3" fill="#0d9488"/>
+  <rect x="42" y="120" width="236" height="12" rx="4" fill="#dcfce7"/>
+  <rect x="42" y="136" width="195" height="10" rx="4" fill="#f0fdf4"/>
+</svg>
+
